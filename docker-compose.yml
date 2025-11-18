@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # Serviço do banco de dados PostgreSQL
+  db:
+    image: postgres:15-alpine
+    container_name: weather_db
+    environment:
+      POSTGRES_DB: ${DB_NAME:-weather_db}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - weather_network
+
+  # Serviço de inicialização do banco e ingestão de dados
+  init_db:
+    build: .
+    container_name: weather_init
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-weather_db}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY}
+      CITY_NAME: ${CITY_NAME:-Florianópolis}
+    depends_on:
+      db:
+        condition: service_healthy
+    command: python ingest_data.py
+    networks:
+      - weather_network
+
+  # Serviço da API FastAPI
+  api:
+    build: .
+    container_name: weather_api
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-weather_db}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY}
+      CITY_NAME: ${CITY_NAME:-Florianópolis}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      init_db:
+        condition: service_completed_successfully
+    networks:
+      - weather_network
+
+# Volume para persistência do banco de dados
+volumes:
+  postgres_data:
+
+# Rede para comunicação entre os serviços
+networks:
+  weather_network:
+    driver: bridge
