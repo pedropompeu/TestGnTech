@@ -219,11 +219,11 @@ function App() {
                 </div>
                 {error && <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-2xl text-[10px] font-black uppercase flex items-center"><AlertCircle className="w-4 h-4 mr-2"/> {error}</div>}
               </div>
-            </div>
 
-            {forecast.length > 0 && (
-              <ForecastCard city={forecastCity} days={forecast} />
-            )}
+              {forecast.length > 0 && (
+                <ForecastCard city={forecastCity} days={forecast} />
+              )}
+            </div>
 
             <div className="aspect-square rounded-[3rem] overflow-hidden shadow-2xl border-[12px] border-white bg-slate-200">
               <WeatherMap center={activeCoords} city={activeCityName} />
