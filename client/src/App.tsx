@@ -5,7 +5,6 @@ import { WeatherCard } from './components/WeatherCard';
 import { WeatherMap } from './components/WeatherMap';
 import { BackgroundMap } from './components/BackgroundMap';
 import { HistoryChart } from './components/HistoryChart';
-import { ForecastCard } from './components/ForecastCard';
 
 function App() {
   const [city, setCity] = useState('');
@@ -18,8 +17,6 @@ function App() {
   const [activeCoords, setActiveCoords] = useState<[number, number]>([-27.5954, -48.5480]);
   const [activeCityName, setActiveCityName] = useState('Florianópolis');
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
-  const [forecast, setForecast] = useState<any[]>([]);
-  const [forecastCity, setForecastCity] = useState<string>('');
   
   const searchTimeout = useRef<any>(null);
 
@@ -85,13 +82,6 @@ function App() {
         setActiveCityName(newRecord.city);
       }
 
-      try {
-        const fRes = await apiClient.get(`/weather/forecast?city=${encodeURIComponent(newRecord.city)}`);
-        setForecast(fRes.data || []);
-        setForecastCity(newRecord.city);
-      } catch {
-        setForecast([]);
-      }
 
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Erro na extração');
@@ -220,9 +210,6 @@ function App() {
                 {error && <div className="mt-4 p-4 bg-red-50 text-red-600 rounded-2xl text-[10px] font-black uppercase flex items-center"><AlertCircle className="w-4 h-4 mr-2"/> {error}</div>}
               </div>
 
-              {forecast.length > 0 && (
-                <ForecastCard city={forecastCity} days={forecast} />
-              )}
             </div>
 
             <div className="aspect-square rounded-[3rem] overflow-hidden shadow-2xl border-[12px] border-white bg-slate-200">
