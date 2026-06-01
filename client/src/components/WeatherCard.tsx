@@ -25,8 +25,17 @@ interface WeatherProps {
   onSelect?: () => void;
 }
 
+function getLabIndex(temp: number, humidity: number): { label: string; color: string; dot: string } {
+  if (temp >= 18 && temp <= 24 && humidity >= 40 && humidity <= 60)
+    return { label: 'Ideal', color: 'text-green-400', dot: 'bg-green-400' };
+  if (temp >= 15 && temp <= 27 && humidity >= 35 && humidity <= 65)
+    return { label: 'Aceitável', color: 'text-amber-400', dot: 'bg-amber-400' };
+  return { label: 'Crítico', color: 'text-red-400', dot: 'bg-red-400' };
+}
+
 export const WeatherCard: React.FC<WeatherProps> = ({ data, isSelected, onSelect }) => {
   const formattedDate = new Date(data.extracted_at).toLocaleString('pt-BR');
+  const labIndex = getLabIndex(data.temperature, data.humidity);
 
   return (
     <div
@@ -43,9 +52,15 @@ export const WeatherCard: React.FC<WeatherProps> = ({ data, isSelected, onSelect
       {/* Header: cidade + status + timestamp */}
       <div className="relative z-10 flex justify-between items-start mb-8">
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-2 h-2 bg-bioteal rounded-full animate-ping"></div>
-            <span className="text-[11px] font-black text-slate-900 uppercase tracking-[0.3em]">Telemetry Active</span>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 bg-bioteal rounded-full animate-ping"></div>
+              <span className="text-[11px] font-black text-slate-900 uppercase tracking-[0.3em]">Telemetry Active</span>
+            </div>
+            <div className="flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded-full">
+              <div className={`w-1.5 h-1.5 rounded-full ${labIndex.dot}`}></div>
+              <span className={`text-[10px] font-black uppercase tracking-widest ${labIndex.color}`}>{labIndex.label}</span>
+            </div>
           </div>
           <h3 className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">{data.city}</h3>
           <div className="flex items-center gap-2 mt-2">

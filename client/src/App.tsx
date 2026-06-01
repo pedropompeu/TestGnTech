@@ -124,8 +124,25 @@ function App() {
             <FlaskConical className="w-8 h-8 text-bioteal" />
             <h1 className="text-2xl font-black text-slate-800 tracking-tighter uppercase">GnTech <span className="text-bioteal">Weather</span></h1>
           </div>
-          <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-2 border-slate-100 px-4 py-1.5 rounded-full">
-            Laboratory Clarity
+          <div className="flex items-center gap-3">
+            {history.length > 0 && (() => {
+              const last = history[0];
+              const t = last.temperature, h = last.humidity;
+              const ideal = t >= 18 && t <= 24 && h >= 40 && h <= 60;
+              const acceptable = t >= 15 && t <= 27 && h >= 35 && h <= 65;
+              const label = ideal ? 'Condição Ideal' : acceptable ? 'Condição Aceitável' : 'Condição Crítica';
+              const color = ideal ? 'text-green-600 border-green-200 bg-green-50' : acceptable ? 'text-amber-600 border-amber-200 bg-amber-50' : 'text-red-600 border-red-200 bg-red-50';
+              const dot = ideal ? 'bg-green-500' : acceptable ? 'bg-amber-500' : 'bg-red-500';
+              return (
+                <div className={`flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest border px-3 py-1.5 rounded-full ${color}`}>
+                  <div className={`w-1.5 h-1.5 rounded-full ${dot}`}></div>
+                  {label}
+                </div>
+              );
+            })()}
+            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-2 border-slate-100 px-4 py-1.5 rounded-full">
+              Laboratory Clarity
+            </div>
           </div>
         </div>
       </header>
