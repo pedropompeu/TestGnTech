@@ -4,6 +4,7 @@ import apiClient from './api/client';
 import { WeatherCard } from './components/WeatherCard';
 import { WeatherMap } from './components/WeatherMap';
 import { BackgroundMap } from './components/BackgroundMap';
+import { HistoryChart } from './components/HistoryChart';
 
 function App() {
   const [city, setCity] = useState('');
@@ -13,8 +14,9 @@ function App() {
   const [suggestions, setSuggestions] = useState([]);
   const [history, setHistory] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [activeCoords, setActiveCoords] = useState<[number, number]>([-27.5954, -48.5480]); 
+  const [activeCoords, setActiveCoords] = useState<[number, number]>([-27.5954, -48.5480]);
   const [activeCityName, setActiveCityName] = useState('Florianópolis');
+  const [selectedCity, setSelectedCity] = useState<string | null>(null);
   
   const searchTimeout = useRef<any>(null);
 
@@ -93,6 +95,7 @@ function App() {
     try {
       await apiClient.delete('/weather/history');
       setHistory([]);
+      setSelectedCity(null);
     } catch (err) {
       setError("Falha ao limpar histórico");
     } finally {
@@ -213,6 +216,14 @@ function App() {
               </button>
             </div>
             
+            {selectedCity && (
+              <HistoryChart
+                data={history}
+                city={selectedCity}
+                onClose={() => setSelectedCity(null)}
+              />
+            )}
+
             <div className="grid grid-cols-1 gap-6 pb-24">
               {history.length === 0 ? (
                 <div className="h-64 bg-white/50 border-2 border-dashed border-slate-200 rounded-[2.5rem] flex flex-col items-center justify-center text-slate-300">
@@ -221,7 +232,12 @@ function App() {
                 </div>
               ) : (
                 history.map((item: any) => (
-                  <WeatherCard key={item.id || Math.random()} data={item} />
+                  <WeatherCard
+                    key={item.id || Math.random()}
+                    data={item}
+                    isSelected={selectedCity === item.city}
+                    onSelect={() => setSelectedCity(prev => prev === item.city ? null : item.city)}
+                  />
                 ))
               )}
             </div>

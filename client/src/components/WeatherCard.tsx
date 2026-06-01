@@ -21,13 +21,18 @@ interface WeatherProps {
     icon?: string;
     extracted_at: string;
   };
+  isSelected?: boolean;
+  onSelect?: () => void;
 }
 
-export const WeatherCard: React.FC<WeatherProps> = ({ data }) => {
+export const WeatherCard: React.FC<WeatherProps> = ({ data, isSelected, onSelect }) => {
   const formattedDate = new Date(data.extracted_at).toLocaleString('pt-BR');
 
   return (
-    <div className="group relative atmospheric-card p-8 rounded-[3rem] hover:shadow-[0_40px_80px_-15px_rgba(13,148,136,0.2)] hover:-translate-y-2">
+    <div
+      onClick={onSelect}
+      className={`group relative atmospheric-card p-8 rounded-[3rem] hover:shadow-[0_40px_80px_-15px_rgba(13,148,136,0.2)] hover:-translate-y-2 ${onSelect ? 'cursor-pointer' : ''} ${isSelected ? 'ring-2 ring-bioteal/40 shadow-teal' : ''}`}
+    >
 
       {/* Textura analógica de sensor */}
       <div className="absolute inset-0 bg-rain opacity-30 pointer-events-none rounded-[3rem]"></div>
