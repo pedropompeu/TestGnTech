@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root, html, body, #root {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
+  }
+
+  #root {
+    /* Camada mínima — deixa o mapa de fundo dominar */
+    background-color: rgba(241, 245, 249, 0.18);
+    background-image:
+      /* Grid técnico — muito sutil */
+      linear-gradient(to right, rgba(13, 148, 136, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(13, 148, 136, 0.04) 1px, transparent 1px);
+
+    background-size: 40px 40px, 40px 40px;
+    background-attachment: fixed;
+    background-repeat: repeat, repeat;
+    background-position: center;
+  }
+}
+
+@layer components {
+  /* Card principal — fundo branco com borda e sombra fria */
+  .atmospheric-card {
+    @apply bg-white border border-slate-100 shadow-xl overflow-hidden;
+    box-shadow: 0 20px 40px -12px rgba(15, 23, 42, 0.08), 0 4px 8px -4px rgba(15, 23, 42, 0.04);
+    transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Textura analógica interna dos cards — ruído mais fino */
+  .bg-rain {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23r)' opacity='1'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    background-repeat: repeat;
+  }
+
+  /* Painel de vidro — overlays e dropdowns */
+  .glass-card {
+    @apply bg-white/40 backdrop-blur-3xl border-2 border-white shadow-2xl;
+  }
+
+  /* Painel escuro — módulos de dados de alto contraste */
+  .dark-panel {
+    @apply bg-slate-900 border-4 border-bioteal/20;
+    box-shadow: 0 0 50px rgba(13, 148, 136, 0.15);
+  }
+}
