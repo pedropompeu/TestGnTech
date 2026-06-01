@@ -4,9 +4,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.limiter import limiter
 from app.db.session import get_db
 from app.services.weather_service import WeatherService
-from app.schemas.weather import WeatherRead
+from app.schemas.weather import WeatherRead, ForecastDay
 
 router = APIRouter()
+
+@router.get("/forecast", response_model=List[ForecastDay])
+async def get_forecast(
+    city: str = Query(..., description="Nome da cidade"),
+    db: AsyncSession = Depends(get_db)
+):
+    service = WeatherService(db)
+    return await service.get_forecast(city)
 
 @router.get("/search", response_model=List[dict])
 async def search_locations(

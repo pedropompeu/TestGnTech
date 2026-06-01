@@ -102,6 +102,63 @@ class WeatherService:
         except Exception:
             return []
 
+    async def get_forecast(self, city: str):
+        try:
+            params = {
+                "q": city,
+                "appid": settings.OPENWEATHER_API_KEY,
+                "units": "metric",
+                "lang": "pt_br",
+                "cnt": 40,
+            }
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    "https://api.openweathermap.org/data/2.5/forecast",
+                    params=params,
+                    timeout=10
+                )
+            if response.status_code == 404:
+                raise HTTPException(status_code=404, detail="Localização não encontrada")
+            response.raise_for_status()
+            items = response.json().get("list", [])
+
+            days: dict = {}
+            weekday_names = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"]
+            for item in items:
+                from datetime import datetime, timezone
+                dt = datetime.fromtimestamp(item["dt"], tz=timezone.utc)
+                date_key = dt.strftime("%Y-%m-%d")
+                if date_key not in days:
+                    days[date_key] = {
+                        "date": dt.strftime("%d/%m"),
+                        "weekday": weekday_names[dt.weekday()],
+                        "temps": [],
+                        "humidities": [],
+                        "descriptions": [],
+                        "icons": [],
+                    }
+                days[date_key]["temps"].append(item["main"]["temp"])
+                days[date_key]["humidities"].append(item["main"]["humidity"])
+                days[date_key]["descriptions"].append(item["weather"][0]["description"])
+                days[date_key]["icons"].append(item["weather"][0]["icon"])
+
+            result = []
+            for day in list(days.values())[:5]:
+                result.append({
+                    "date": day["date"],
+                    "weekday": day["weekday"],
+                    "temp_min": round(min(day["temps"]), 1),
+                    "temp_max": round(max(day["temps"]), 1),
+                    "humidity": round(sum(day["humidities"]) / len(day["humidities"])),
+                    "description": day["descriptions"][len(day["descriptions"]) // 2],
+                    "icon": day["icons"][len(day["icons"]) // 2],
+                })
+            return result
+        except HTTPException:
+            raise
+        except httpx.RequestError as e:
+            raise HTTPException(status_code=503, detail=f"Erro de conexão: {str(e)}")
+
     async def extract_by_city(self, city: str):
         return await self._fetch_from_api({"q": city})
 

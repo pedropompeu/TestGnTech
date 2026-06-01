@@ -27,3 +27,12 @@ class WeatherRead(WeatherBase):
 
     class Config:
         from_attributes = True
+
+class ForecastDay(BaseModel):
+    date: str
+    weekday: str
+    temp_min: float
+    temp_max: float
+    humidity: int
+    description: str
+    icon: str
