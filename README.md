@@ -12,7 +12,7 @@ A aplicação coleta dados climáticos em tempo real via OpenWeather API, persis
 |---|---|
 | Busca com autocomplete | Sugestões em tempo real com prioridade para cidades brasileiras |
 | Extração por cidade ou GPS | Coleta dados meteorológicos completos e persiste no banco |
-| Previsão 5 dias | Próximos 5 dias com temperatura min/max, ícone e descrição por dia |
+| Previsão 5 dias | Botão expansível em cada card — ícone, temp min/max e dia da semana para os próximos 5 dias |
 | Gráfico de histórico | Série temporal de temperatura e umidade por cidade (clique no card) |
 | Índice laboratorial | Badge por leitura + status global indicando condição ideal/aceitável/crítica |
 | Mapa de fundo interativo | Mapa-múndi monocromático que anima até a cidade selecionada |
@@ -203,9 +203,8 @@ TestGnTech/
 │   ├── src/
 │   │   ├── components/
 │   │   │   ├── BackgroundMap.tsx         # Mapa de fundo interativo (fixed)
-│   │   │   ├── ForecastCard.tsx          # Previsão 5 dias
 │   │   │   ├── HistoryChart.tsx          # Gráfico de série temporal (recharts)
-│   │   │   ├── WeatherCard.tsx           # Card com dados + índice laboratorial
+│   │   │   ├── WeatherCard.tsx           # Card com dados, índice laboratorial e previsão 5 dias expansível
 │   │   │   └── WeatherMap.tsx            # Mapa local com camada de nuvens
 │   │   ├── api/client.ts                 # Axios configurado
 │   │   └── App.tsx                       # Estado global e layout
