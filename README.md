@@ -27,7 +27,7 @@ A aplicação coleta dados climáticos em tempo real via OpenWeather API, persis
 
 ```bash
 # 1. Clone o repositório
-git clone https://github.com/pedropompeu/TestGnTech.git
+git clone https://github.com/pedropompeu/GnTechWeather.git
 cd TestGnTech
 
 # 2. Configure as variáveis de ambiente
