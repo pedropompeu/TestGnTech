@@ -4,6 +4,8 @@
 
 A aplicação coleta dados climáticos em tempo real via OpenWeather API, persiste no PostgreSQL e os exibe em uma interface construída com React + Tailwind CSS. O design segue o conceito **Laboratory Clarity / Atmospheric Signal**: dados têm textura antes de ter forma.
 
+![GnTechWeather](docs/image-GnTech.jpeg)
+
 ---
 
 ## Funcionalidades
