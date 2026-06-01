@@ -175,21 +175,26 @@ export const WeatherCard: React.FC<WeatherProps> = ({ data, isSelected, onSelect
       </div>
 
       {/* Botão expansível — Previsão 5 dias */}
-      <div className="relative z-10 mt-6 border-t border-slate-100 pt-5">
+      <div className="relative z-10 mt-6">
         <button
           onClick={handleForecastToggle}
-          className="w-full flex items-center justify-between px-2 group/forecast"
+          className={`w-full flex items-center justify-between px-6 py-4 rounded-[1.5rem] border-2 transition-all duration-200 ${
+            forecastOpen
+              ? 'bg-slate-900 border-bioteal/30 shadow-teal'
+              : 'bg-slate-50 border-slate-200 hover:bg-bioteal/5 hover:border-bioteal/30'
+          }`}
         >
-          <div className="flex items-center gap-2">
-            {forecastLoading
-              ? <Loader2 className="w-4 h-4 text-bioteal animate-spin" />
-              : <Waves className="w-4 h-4 text-bioteal" />
-            }
-            <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest">
-              Previsão 5 Dias
+          <div className="flex items-center gap-3">
+            <Waves className={`w-4 h-4 ${forecastOpen ? 'text-bioteal' : 'text-slate-400'}`} />
+            <span className={`text-[11px] font-black uppercase tracking-widest ${forecastOpen ? 'text-white' : 'text-slate-600'}`}>
+              Previsão para os Próximos 5 Dias
             </span>
+            <Waves className={`w-4 h-4 ${forecastOpen ? 'text-bioteal' : 'text-slate-400'}`} />
           </div>
-          <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${forecastOpen ? 'rotate-180' : ''}`} />
+          {forecastLoading
+            ? <Loader2 className="w-4 h-4 text-bioteal animate-spin" />
+            : <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${forecastOpen ? 'rotate-180 text-bioteal' : 'text-slate-400'}`} />
+          }
         </button>
 
         {forecastOpen && forecastData.length > 0 && (
