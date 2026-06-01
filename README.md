@@ -6,16 +6,18 @@ A aplicação coleta dados climáticos em tempo real via OpenWeather API, persis
 
 ---
 
-## Demonstração
+## Funcionalidades
 
 | Funcionalidade | Descrição |
 |---|---|
 | Busca com autocomplete | Sugestões em tempo real com prioridade para cidades brasileiras |
 | Extração por cidade ou GPS | Coleta dados meteorológicos completos e persiste no banco |
+| Previsão 5 dias | Próximos 5 dias com temperatura min/max, ícone e descrição por dia |
+| Gráfico de histórico | Série temporal de temperatura e umidade por cidade (clique no card) |
+| Índice laboratorial | Badge por leitura + status global indicando condição ideal/aceitável/crítica |
 | Mapa de fundo interativo | Mapa-múndi monocromático que anima até a cidade selecionada |
-| Mapa local com nuvens | Visualização satelital com camada de nuvens OpenWeather em tempo real |
+| Mapa local com nuvens | Visualização de rua com camada de nuvens OpenWeather em tempo real |
 | Histórico de monitoramento | Todos os registros coletados, ordenados do mais recente |
-| Dados completos por coleta | Temperatura, sensação térmica, min/max, umidade, vento, pressão, precipitação |
 
 ---
 
@@ -118,6 +120,7 @@ Base URL: `http://localhost:8000/api/v1`
 | `GET` | `/weather/search?q={query}` | Autocomplete de cidades |
 | `POST` | `/weather/extract?city={nome}` | Extrai dados por nome de cidade |
 | `POST` | `/weather/extract/geo?lat={}&lon={}` | Extrai dados por coordenadas GPS |
+| `GET` | `/weather/forecast?city={nome}` | Previsão dos próximos 5 dias |
 | `GET` | `/weather/history?limit={n}` | Retorna histórico de extrações |
 | `DELETE` | `/weather/history` | Limpa todo o histórico |
 
@@ -148,6 +151,34 @@ Documentação interativa completa (Swagger UI) disponível em `/docs`.
 ```
 </details>
 
+<details>
+<summary>Exemplo de resposta — GET /weather/forecast</summary>
+
+```json
+[
+  { "date": "01/06", "weekday": "Seg", "temp_min": 15.6, "temp_max": 22.0, "humidity": 74, "description": "nublado", "icon": "04d" },
+  { "date": "02/06", "weekday": "Ter", "temp_min": 14.0, "temp_max": 20.1, "humidity": 77, "description": "nublado", "icon": "04d" },
+  { "date": "03/06", "weekday": "Qua", "temp_min": 14.8, "temp_max": 19.8, "humidity": 84, "description": "nublado", "icon": "04d" },
+  { "date": "04/06", "weekday": "Qui", "temp_min": 16.2, "temp_max": 21.5, "humidity": 70, "description": "céu limpo", "icon": "01d" },
+  { "date": "05/06", "weekday": "Sex", "temp_min": 17.0, "temp_max": 23.0, "humidity": 65, "description": "poucas nuvens", "icon": "02d" }
+]
+```
+</details>
+
+---
+
+## Índice de Condição Laboratorial
+
+Cada leitura é classificada automaticamente com base em temperatura e umidade:
+
+| Condição | Temperatura | Umidade | Cor |
+|---|---|---|---|
+| **Ideal** | 18°C – 24°C | 40% – 60% | Verde |
+| **Aceitável** | 15°C – 27°C | 35% – 65% | Âmbar |
+| **Crítico** | Fora dos ranges | Fora dos ranges | Vermelho |
+
+O badge aparece em cada card de leitura e o status da última extração é exibido no header da aplicação.
+
 ---
 
 ## Estrutura de Arquivos
@@ -163,7 +194,7 @@ TestGnTech/
 │   │   ├── db/session.py                 # Engine async + get_db()
 │   │   ├── models/weather.py             # Modelo SQLAlchemy
 │   │   ├── repositories/                 # BaseRepository + WeatherRepository
-│   │   ├── schemas/weather.py            # Pydantic schemas
+│   │   ├── schemas/weather.py            # Pydantic schemas + ForecastDay
 │   │   ├── services/weather_service.py   # Lógica + integração OpenWeather
 │   │   └── main.py                       # App FastAPI, CORS, startup
 │   ├── Dockerfile
@@ -172,19 +203,17 @@ TestGnTech/
 │   ├── src/
 │   │   ├── components/
 │   │   │   ├── BackgroundMap.tsx         # Mapa de fundo interativo (fixed)
-│   │   │   ├── WeatherCard.tsx           # Card de dados meteorológicos
+│   │   │   ├── ForecastCard.tsx          # Previsão 5 dias
+│   │   │   ├── HistoryChart.tsx          # Gráfico de série temporal (recharts)
+│   │   │   ├── WeatherCard.tsx           # Card com dados + índice laboratorial
 │   │   │   └── WeatherMap.tsx            # Mapa local com camada de nuvens
 │   │   ├── api/client.ts                 # Axios configurado
 │   │   └── App.tsx                       # Estado global e layout
 │   ├── tailwind.config.js
 │   ├── Dockerfile
 │   └── package.json
-├── brand/
-│   ├── design-tokens.css                 # Tokens de design (3 camadas)
-│   └── tailwind.config.ts                # Config Tailwind de referência
 ├── db/
 │   └── init.sql                          # Schema inicial do PostgreSQL
-├── BRAND.md                              # Sistema de design completo
 ├── docker-compose.yml
 ├── .env.example
 └── .gitignore
@@ -203,25 +232,3 @@ OPENWEATHER_API_KEY=sua_chave_aqui   # https://openweathermap.org/api
 ```
 
 O arquivo `.env` está no `.gitignore` e nunca é versionado. Use `.env.example` como base.
-
----
-
-## Design System
-
-O projeto possui um sistema de design documentado em `BRAND.md` e `brand/`, seguindo o conceito **Laboratory Clarity / Atmospheric Signal**:
-
-- **Paleta:** BioTeal (`#0D9488`) + Slate frio — sem cores quentes
-- **Tipografia:** Inter (UI) + JetBrains Mono (valores de sensor)
-- **Tokens:** 3 camadas — Primitivo → Semântico → Componente
-- **Superfícies:** 7 tipos definidos (App BG, Surface, Dark Module, Overlay...)
-- **Mapa de fundo:** CartoDB/OSM monocromático com `flyTo` animado ao selecionar cidade
-
----
-
-## Roadmap
-
-Funcionalidades planejadas para próximas iterações:
-
-- [ ] **Gráfico de histórico** — `recharts` (já instalado) com curva de temperatura/umidade por cidade
-- [ ] **Previsão 5 dias** — endpoint `/weather/forecast` + `ForecastCard` no frontend
-- [ ] **Índice de condição laboratorial** — badge que indica se o ambiente está ideal para experimentos (temp 18–24°C, umidade 40–60%)
